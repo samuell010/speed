@@ -14,8 +14,8 @@ function App() {
   const [gameLaunch, setGameLaunch] = useState(true);
   const [gameOn, setGameOn] = useState(false);
   const [gameOver, setGameOver] = useState(false);
+  const [chances, setChances] = useState(3); // Track remaining chances
 
-  // we use useRef to store the value between renders
   const timeoutIdRef = useRef(null);
   const roundsCount = useRef(0);
   const currentInst = useRef(0);
@@ -24,23 +24,14 @@ function App() {
   let levelAmount;
 
   const gameSetHandler = (level, name) => {
-    // findIndex() from array based on level name and then reading amount from object
-    // const levelIndex = levels.findIndex((el) => el.name === level);
-    // levelAmount = levels[levelIndex].amount;
-
-    // find() matching name and destructuring the amount
     const { amount } = levels.find((el) => el.name === level);
     levelAmount = amount;
 
     const circlesArray = Array.from({ length: levelAmount }, (_, i) => i);
 
     setCircles(circlesArray);
-    setPlayer({
-      level: level,
-      name: name,
-    });
-
-    // using the callback to ensure that we have the latest state
+    setPlayer({ level, name });
+    setChances(3); // Reset chances when the game starts
     setGameLaunch((prevLaunch) => !prevLaunch);
     gameStart();
   };
@@ -52,7 +43,6 @@ function App() {
     }
 
     let nextActive;
-
     do {
       nextActive = getRndInt(0, levelAmount);
     } while (nextActive === currentInst.current);
@@ -64,14 +54,21 @@ function App() {
     timeoutIdRef.current = setTimeout(randomNumb, pace);
   };
 
-  function gameStart() {
+  const gameStart = () => {
     setGameOn(!gameOn);
     randomNumb();
-  }
+  };
 
   const clickHandler = (id) => {
     if (current !== id) {
-      stopHandler();
+      // Handle wrong click
+      setChances((prev) => {
+        const newChances = prev - 1;
+        if (newChances <= 0) {
+          stopHandler();
+        }
+        return newChances;
+      });
       return;
     }
     setScore((prevScore) => prevScore + 10);
@@ -92,11 +89,12 @@ function App() {
     setGameOver(!gameOver);
     setGameLaunch(!gameLaunch);
     setScore(0);
+    setChances(3); // Reset chances when game is closed
   };
 
   return (
-    <>
-      <h1>Catch the snow!</h1>
+    <div className="app-container">
+      <h1>Catch your money</h1>
       {gameLaunch && <NewGame onclick={gameSetHandler} />}
       {gameOn && (
         <Game
@@ -110,7 +108,7 @@ function App() {
       {gameOver && (
         <GameOver closeHandler={closeHandler} {...player} score={score} />
       )}
-    </>
+    </div>
   );
 }
 

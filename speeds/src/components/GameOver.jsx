@@ -1,4 +1,4 @@
-function GameOver({closeHandler, name, score, level}) {
+function GameOver({ closeHandler, name, score, level }) {
   return (
     <div className="overlay">
       <div className="gameover_box">
@@ -8,11 +8,7 @@ function GameOver({closeHandler, name, score, level}) {
           <p className="score">{score}</p>
           <p>{level}</p>
         </div>
-        <p>
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quos
-          perferendis eaque repellat, magnam error vero debitis necessitatibus
-          fugit ut a?
-        </p>
+        <p>Thanks for playing! Try again and beat your score!</p>
         <button onClick={closeHandler}>X</button>
       </div>
     </div>
